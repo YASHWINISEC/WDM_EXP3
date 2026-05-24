@@ -1,5 +1,4 @@
 ### EX3 Implementation of GSP Algorithm In Python
-### DATE: 
 ### AIM: To implement GSP Algorithm In Python.
 ### Description:
 The Generalized Sequential Pattern (GSP) algorithm is a data mining technique used for discovering frequent patterns within a sequence database. It operates by identifying sequences that frequently occur together. GSP works by employing a depth-first search strategy to explore and extract frequent patterns efficiently.
@@ -43,16 +42,63 @@ from collections import defaultdict
 from itertools import combinations
 # Function to generate candidate k-item sequences
 def generate_candidates(dataset, k):
+    candidates = []
+    if k == 1:
+        # Generate 1-item sequences from the dataset
+        for sequence in dataset:
+            for item in sequence:
+                if [item] not in candidates:
+                    candidates.append([item])
+    else:
+        # Generate k-item sequences by merging frequent (k-1)-item sequences
+        previous_candidates = generate_candidates(dataset, k - 1)
+        for i in range(len(previous_candidates)):
+            for j in range(i+1, len(previous_candidates)):
+                seq1, seq2 = previous_candidates[i], previous_candidates[j]
+                if seq1[:-1] == seq2[:-1]:  # Merge if the first k-1 items are the same
+                    candidates.append(seq1 + [seq2[-1]])
+    return candidates
 
-
-    /WRITE YOUR CODE HERE/
 
 
 #Function to perform GSP algorithm
 def gsp(dataset, min_support):
+     k = 1
+    frequent_patterns = {}
+    
+    while True:
+        candidates = generate_candidates(dataset, k)
+        if not candidates:
+            break
 
+        # Count support for each candidate
+        support_count = defaultdict(int)
+        for sequence in dataset:
+            for candidate in candidates:
+                if is_subsequence(candidate, sequence):
+                    support_count[tuple(candidate)] += 1
 
-  /WRITE YOUR CODE HERE/
+        # Filter candidates based on minimum support
+        current_frequents = {k: v for k, v in support_count.items() if v >= min_support}
+        if not current_frequents:
+            break
+
+        frequent_patterns.update(current_frequents)
+        k += 1
+
+    return frequent_patterns
+
+# Function to check if candidate is a subsequence
+def is_subsequence(candidate, sequence):
+    seq_index = 0
+    for item in candidate:
+        while seq_index < len(sequence) and sequence[seq_index] != item:
+            seq_index += 1
+        if seq_index == len(sequence):
+            return False
+        seq_index += 1
+    return True
+  
 
 
 #Example dataset for each category
@@ -102,6 +148,9 @@ else:
  print("No frequent sequential patterns found in Party Wear.")
 ```
 ### Output:
+![image](https://github.com/user-attachments/assets/60ae3584-c199-4710-8558-eff2f5a2fe7f)
+
+![image](https://github.com/user-attachments/assets/b6f84fc4-9bd9-4c28-b424-8cefdee2047d)
 
 ### Visualization:
 ```python
@@ -130,6 +179,13 @@ visualize_patterns_line(bottom_wear_result, 'Bottom Wear')
 visualize_patterns_line(party_wear_result, 'Party Wear')
 ```
 ### Output:
+![image](https://github.com/user-attachments/assets/c51c674c-2767-443e-8d92-b73e38b201ec)
+
+![image](https://github.com/user-attachments/assets/f96fad91-651d-4e0d-8eae-3b0ba32e4a90)
+
+![image](https://github.com/user-attachments/assets/ca18e34b-456b-4e86-8955-e89de075fb0d)
 
 
 ### Result:
+Thus the implementation of the GSP algorithm in python has been successfully executed.
+
